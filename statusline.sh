@@ -90,11 +90,22 @@ if [ "$observed" = "true" ]; then
   cache=" ${dim}|${r} ${dim}⧗${r} $cache"
 fi
 
-# --- git branch, joined to the dir as dir:branch; only for repos with a remote, so a fresh local `git init` stays quiet ---
+# --- git branch + dirty/ahead markers, joined to the dir as dir:branch; only for repos with a remote, so a fresh local `git init` stays quiet ---
+# Markers follow git's own prompt (git-prompt.sh): * unstaged, + staged,
+# > ahead, < behind, <> diverged. One `git status` gives branch, dirty state
+# and ahead/behind; -uno skips the untracked scan (the slow part in big repos),
+# and --no-optional-locks keeps it from taking the index lock while Claude runs git.
 branch=""
 if [ -n "$cwd" ] && [ -n "$(git -C "$cwd" remote 2>/dev/null)" ]; then
-  b=$(git -C "$cwd" branch --show-current 2>/dev/null)
-  [ -n "$b" ] && branch=":${b}"
+  branch=$(git -C "$cwd" --no-optional-locks status --porcelain=v2 --branch -uno 2>/dev/null | awk '
+    $1 == "#" && $2 == "branch.head" { head = $3 }
+    $1 == "#" && $2 == "branch.ab"   { ahead = ($3 != "+0"); behind = ($4 != "-0") }
+    $1 ~ /^[12u]$/ { if (substr($2,1,1) != ".") staged = 1; if (substr($2,2,1) != ".") unstaged = 1 }
+    END {
+      if (head == "" || head == "(detached)") exit
+      printf ":%s%s%s%s", head, (unstaged ? "*" : ""), (staged ? "+" : ""),
+        (ahead && behind ? "<>" : ahead ? ">" : behind ? "<" : "")
+    }')
 fi
 
 printf '%s %s|%s %s%s %s|%s %s⧉ %s%s%s%s%s' \
