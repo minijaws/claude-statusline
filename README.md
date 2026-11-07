@@ -6,13 +6,13 @@ row format for subagents.
 ## Main status line — `statusline.sh`
 
 ```
-Opus | my-project | main | ⧉ 50k/200k (25%) | ⧗22:05 | 2h14m 31% · 3d 12% | $1.84
+Opus | my-project | main | ⧉ 50k/200k (25%) | ⧗ 22:05 | 2h14m 31% · 3d 12% | $1.84
 ```
 
 | Segment | Source |
 |---|---|
 | Model | `model.display_name` |
-| Directory, git branch | `workspace.current_dir`, `git branch --show-current` |
+| Directory, git branch | `workspace.current_dir`, `git branch --show-current`; branch shown only when the repo has a remote |
 | `⧉` context used / window (pct) | `context_window.*`, green < 60% ≤ yellow < 80% ≤ red |
 | `⧗` time the prompt cache goes cold | `prompt_cache.expires_at`; yellow in the last 5 minutes, red `cold` once expired. Hidden until the first response, or if the provider doesn't report caching |
 | Rate-limit windows, labelled with time to reset | `rate_limits.five_hour`, `rate_limits.seven_day`; omitted when not reported |
@@ -60,3 +60,7 @@ Then add to `~/.claude/settings.json`:
 The subagent rows need a Claude Code version with `subagentStatusLine`; the `⧗`
 segment needs one that sends `prompt_cache` (v2.1.251+). See the
 [status line docs](https://code.claude.com/docs/en/statusline) for the input fields.
+
+## License
+
+MIT — see [LICENSE](LICENSE).

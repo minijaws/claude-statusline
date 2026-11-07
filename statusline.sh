@@ -83,12 +83,12 @@ if [ "$observed" = "true" ]; then
   elif [ "$left" -le 300 ]; then cache="$(pressure 60)$(hhmm "$exp")${r}"
   else                          cache="$(pressure 0)$(hhmm "$exp")${r}"
   fi
-  cache=" ${dim}|${r} ${dim}⧗${r}$cache"
+  cache=" ${dim}|${r} ${dim}⧗${r} $cache"
 fi
 
-# --- git branch ---
+# --- git branch: only for repos with a remote, so a fresh local `git init` stays quiet ---
 branch=""
-if [ -n "$cwd" ] && git -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
+if [ -n "$cwd" ] && [ -n "$(git -C "$cwd" remote 2>/dev/null)" ]; then
   b=$(git -C "$cwd" branch --show-current 2>/dev/null)
   [ -n "$b" ] && branch=" ${dim}|${r} ${b}"
 fi
