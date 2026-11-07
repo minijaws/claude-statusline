@@ -6,6 +6,10 @@ now=$(date +%s)
 r=$'\033[0m'; dim=$'\033[2m'
 
 model=$(jq -r '.model.display_name // "?"' <<<"$input")
+# effort as a short dim suffix, no separator (Opus 5.5h); absent when the model has no effort setting
+effort=$(jq -r '.effort.level // empty
+  | {low:"l",medium:"m",high:"h",xhigh:"xh",max:"max"}[.] // .' <<<"$input")
+[ -n "$effort" ] && model="${model}${dim}${effort}${r}"
 cwd=$(jq -r '.workspace.current_dir // .cwd // ""' <<<"$input")
 dir=$(basename "$cwd")
 
@@ -86,11 +90,11 @@ if [ "$observed" = "true" ]; then
   cache=" ${dim}|${r} ${dim}⧗${r} $cache"
 fi
 
-# --- git branch: only for repos with a remote, so a fresh local `git init` stays quiet ---
+# --- git branch, joined to the dir as dir:branch; only for repos with a remote, so a fresh local `git init` stays quiet ---
 branch=""
 if [ -n "$cwd" ] && [ -n "$(git -C "$cwd" remote 2>/dev/null)" ]; then
   b=$(git -C "$cwd" branch --show-current 2>/dev/null)
-  [ -n "$b" ] && branch=" ${dim}|${r} ${b}"
+  [ -n "$b" ] && branch=":${b}"
 fi
 
 printf '%s %s|%s %s%s %s|%s %s⧉ %s%s%s%s%s' \

@@ -6,13 +6,13 @@ row format for subagents.
 ## Main status line — `statusline.sh`
 
 ```
-Opus | my-project | main | ⧉ 50k/200k (25%) | ⧗ 22:05 | 2h14m 31% · 3d 12% | $1.84
+Opus 5.5h | my-project:main | ⧉ 50k/200k (25%) | ⧗ 22:05 | 2h14m 31% · 3d 12% | $1.84
 ```
 
 | Segment | Source |
 |---|---|
-| Model | `model.display_name` |
-| Directory, git branch | `workspace.current_dir`, `git branch --show-current`; branch shown only when the repo has a remote |
+| Model + effort | `model.display_name`, `effort.level` as `l` `m` `h` `xh` `max`; dimmed, no separator; hidden when the model has none |
+| `dir:branch` | `workspace.current_dir`, `git branch --show-current`; branch shown only when the repo has a remote |
 | `⧉` context used / window (pct) | `context_window.*`, green < 60% ≤ yellow < 80% ≤ red |
 | `⧗` time the prompt cache goes cold | `prompt_cache.expires_at`; yellow in the last 5 minutes, red `cold` once expired. Hidden until the first response, or if the provider doesn't report caching |
 | Rate-limit windows, labelled with time to reset | `rate_limits.five_hour`, `rate_limits.seven_day`; omitted when not reported |
@@ -24,10 +24,10 @@ Each agent in the panel below the prompt shows its **own** context, not the main
 conversation's:
 
 ```
-Explore · Searching the repo for statusline handl… | ⧉ 143.2k/200k (71%) | 3m
+Explore haikul · Searching the repo for statusline handl… | ⧉ 143.2k/200k (71%) | 3m
 ```
 
-Name (or agent type), progress label (truncated to fit), context tokens/window with
+Name (or agent type), model family (dimmed) and effort (same letters, or the token budget like `16k`; each shown once known), progress label (truncated to fit), context tokens/window with
 the same colour thresholds, elapsed time, and `[completed]` / `[failed]` once an
 agent stops.
 
